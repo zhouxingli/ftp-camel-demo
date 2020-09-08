@@ -1,0 +1,68 @@
+package com.gdtopway.realtimedata.util;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by rainbow on 2018/11/8.
+ */
+public  class  RealTimeDataOrgTag {
+
+    public final static Map<String,String> tag_org = new HashMap<String,String>();
+
+    static {
+        tag_org.put("FS-ALLP", "0306");
+
+        tag_org.put("SQ-ALLP", "030603");
+        tag_org.put("CQ-ALLP", "03060306");
+        tag_org.put("NZ-ALLP", "03060307");
+
+
+        tag_org.put("NH-ALLP",   "030612");
+        tag_org.put("NHDL-ALLP", "03061211");
+        tag_org.put("NHLS-ALLP", "03061212");
+        tag_org.put("NHLC-ALLP", "03061213");
+        tag_org.put("NHXQ-ALLP", "03061214");
+        tag_org.put("NHJJ-ALLP", "03061215");
+        tag_org.put("NHDZ-ALLP", "03061216");
+        tag_org.put("NHSS-ALLP", "03061217");
+        tag_org.put("NHGC-ALLP", "03061218");
+
+        tag_org.put("SD-ALLP",   "030613");
+        tag_org.put("SDDL-ALLP", "03061311");
+        tag_org.put("SDLJ2-ALLP","03061312");
+        tag_org.put("SDBJ-ALLP", "03061313");
+        tag_org.put("SDCC-ALLP", "03061314");
+        tag_org.put("SDLC-ALLP", "03061315");
+        tag_org.put("SDLJ1-ALLP","03061316");
+        tag_org.put("SDLL-ALLP", "03061317");
+        tag_org.put("SDXT-ALLP", "03061318");
+        tag_org.put("SDJA-ALLP", "03061319");
+        tag_org.put("SDRG-ALLP", "03061320");
+
+        tag_org.put("SS-ALLP",   "030614");
+        tag_org.put("SSXN-ALLP", "03061405");
+        tag_org.put("SSLP-ALLP", "03061406");
+        tag_org.put("SSLB-ALLP", "03061407");
+        tag_org.put("SSDT-ALLP", "03061408");
+        tag_org.put("SSBL-ALLP", "03061409");
+        tag_org.put("SSJK-ALLP", "03061410");
+
+        tag_org.put("GM-ALLP",   "030615");
+        tag_org.put("GMHC-ALLP", "03061507");
+        tag_org.put("GMGH-ALLP", "03061508");
+        tag_org.put("GMMC-ALLP", "03061509");
+        tag_org.put("GMYH-ALLP", "03061510");
+
+
+
+
+
+
+
+
+
+
+
+    }
+}

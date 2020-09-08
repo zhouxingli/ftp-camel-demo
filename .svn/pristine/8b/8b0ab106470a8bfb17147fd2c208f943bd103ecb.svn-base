@@ -1,0 +1,93 @@
+package com.gdtopway.realtimedata.processor;
+
+import com.gdtopway.realtimedata.config.BaseConfig;
+import com.gdtopway.realtimedata.domain.RealTimeLoad;
+import com.gdtopway.realtimedata.domain.State;
+import com.gdtopway.realtimedata.repository.RealTimeLoadRepository;
+import com.gdtopway.realtimedata.service.IRealTimeDataService;
+import com.gdtopway.realtimedata.service.StateService;
+import com.gdtopway.realtimedata.util.*;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.component.file.GenericFileMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.*;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by rainbow on 2018/11/6.
+ * 调度数据处理器
+ */
+@Component
+public class DataProcessor implements Processor {
+
+    @Value("${ftp.local-dir}")
+    private String localDir;
+  /*  @Autowired
+    private HandleFile handleFile;*/
+    @Autowired
+    protected BaseConfig baseConfig;
+    @Autowired
+    private RealTimeLoadRepository realTimeLoadRepository;
+    @Autowired
+    private StateService stateService;
+    @Autowired
+    private IRealTimeDataService iRealTimeDataService;
+    @Autowired
+    private RenameFile renameFile;
+    @Autowired
+    private CopyFile copyFile;
+    @Autowired
+    private ParseDataFromfile parseDataFromfile;
+    @Autowired
+    private StateFile stateFile;
+
+    private static final Logger logger = LoggerFactory.getLogger(DataProcessor.class);
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+
+        GenericFileMessage<RandomAccessFile> inFileMessage = (GenericFileMessage<RandomAccessFile>) exchange.getIn();
+        String fileName = null;
+        boolean isComplete = false;
+        while (!isComplete) {
+            fileName = inFileMessage.getGenericFile().getFileName();
+            String filePath = localDir + '/' + fileName;
+            File file = new File(filePath);
+            if (file.exists()) {
+                isComplete = true;
+            } else {
+                continue;
+            }
+        }
+       // handleFile.handleFile(localDir,fileName);
+        //1.调用重命名文件
+        Map<String, String> renameMap =  renameFile.reNameFile(localDir,fileName);
+
+        if (renameMap.get("flag").equals("true")) {//取出重命名文件中的返回信息（重命名文件规准时间与数据库规准时间相比）
+            //2.将文件复制到相应年月日下
+            Map<String, String> copyFileMap = copyFile.copyFileTo(renameMap);
+            //3.解析文件
+            List<RealTimeLoad> list = parseDataFromfile.parseRealTime(copyFileMap);
+            //4.保存文件
+            List<RealTimeLoad> realList = iRealTimeDataService.saveList(list);
+            if (realList.size()>0) {
+                copyFileMap.put("putInStorageState","success") ;
+            } else {
+                copyFileMap.put("putInStorageState","fail") ;
+            }
+            State state = stateFile.saveStateInfo(copyFileMap);
+            stateService.saveState(state);
+        }else{
+            State state = stateFile.saveStateInfo(renameMap);
+            stateService.saveState(state);
+        }
+
+    }
+}

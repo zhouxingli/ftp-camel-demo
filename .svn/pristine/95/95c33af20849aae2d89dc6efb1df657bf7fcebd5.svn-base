@@ -1,0 +1,40 @@
+package com.gdtopway.realtimedata.util;
+
+import com.gdtopway.realtimedata.domain.RealTimeLoad;
+import com.gdtopway.realtimedata.domain.State;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+@Component
+public class StateFile {
+
+    public State saveStateInfo(Map<String, String> copyFileMap) {
+
+        String reNameFilePath = copyFileMap.get("reNameFilePath");
+        String originallyFile = copyFileMap.get("originallyFile");
+        String newMovePath = copyFileMap.get("newMovePath");
+        String copyFile1 = copyFileMap.get("copyFile");
+       String putInStorageState= copyFileMap.get("putInStorageState");
+        String renameDBTime = copyFileMap.get("renameDBTime");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date stateTime = null;
+        try {
+            stateTime = formatter.parse(renameDBTime.toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        State state = new State();
+        state.setOriginallyFilePath(reNameFilePath);
+        state.setOriginallyFileState(originallyFile);
+        state.setCopyFilePath(newMovePath);
+        state.setCopyFileState(copyFile1);
+        state.setPutInStorageState(putInStorageState);
+        state.setStateTime(stateTime);
+        return state;
+
+    }
+}

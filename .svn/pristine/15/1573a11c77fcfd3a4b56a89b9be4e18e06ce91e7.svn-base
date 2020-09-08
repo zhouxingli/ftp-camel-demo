@@ -1,0 +1,11 @@
+base.defaultThemes=default
+base.staticRescorceDir=static
+base.generateDefaultThemes=default
+
+base.FS-ALLP = 0306
+base.ss-ALLP = 0306
+base.s2-ALLP = 0306
+base.s3-ALLP = 0306
+
+
+

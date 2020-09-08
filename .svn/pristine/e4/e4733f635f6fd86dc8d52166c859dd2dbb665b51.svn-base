@@ -1,0 +1,75 @@
+package com.gdtopway.realtimedata.util;
+
+import com.gdtopway.realtimedata.config.BaseConfig;
+import com.gdtopway.realtimedata.domain.State;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
+
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
+@Component
+public class CopyFile {
+//复制文件到年月日文件夹下
+@Autowired
+protected BaseConfig baseConfig;
+    public File copyFileTo(File reNameFile,State state) {
+        //2、判断年月日,文件夹下,是否存在该快照(精确到分钟)文件。如果不存在,则移动快照至相应的文件夹,年、月、日,在日文件夹下,以时间命名。
+        String newfilePath = baseConfig.getNewFilePath();//年月日下文件指定位置
+        InputStream input=null;
+        FileOutputStream output=null;
+        String  reNameFileName=reNameFile.getName();//根据重命名文件得到文件名
+        String reNameFilePath= reNameFile.getPath();//根据重命名文件得到文件路径
+        String[] s1= reNameFileName.split(" ");//将新命名文件按空格分开
+        String[] newS1=s1[0].split("-");
+        Calendar date=Calendar.getInstance();
+        SimpleDateFormat format1=new SimpleDateFormat( newS1[0]);
+        SimpleDateFormat format2=new SimpleDateFormat( newS1[1]);
+        SimpleDateFormat format3=new SimpleDateFormat( newS1[2]);
+        String name1=format1.format(date.getTime());
+        String name2=format2.format(date.getTime());
+        String name3=format3.format(date.getTime());
+        File moveNewFiles=new File( newfilePath+File.separator+name1+"/"+name2+"/"+name3+"/");//创建年月日的文件夹
+        if(!moveNewFiles.exists()){
+            moveNewFiles.mkdirs();
+        }
+        //将修改名字后的文件复制到对应年月日文件夹中
+        String newMovePath = moveNewFiles.getPath()+ File.separator + reNameFile.getName();
+        File newMovefile=new File(newMovePath);
+        try {
+            if(!newMovefile.exists()){//不存在就复制到该文件夹目录下
+                input = new FileInputStream(reNameFilePath);//绝对原文件路径
+                output = new FileOutputStream(newMovePath);//要拷贝到的文件路径
+                FileCopyUtils.copy(input, output);
+                state.setCopyFileState("success");
+                String originallyFileState=state.getOriginallyFileState();
+                if ("success".equals(originallyFileState)) {//改名成功和复制成功，把改名后文件删除
+                    File file = new File(reNameFilePath);
+                    file.delete();
+                }
+            }else if(newMovefile.exists()){//如果已经存在 ，则删除该文件，将现在文件复制进去
+                reNameFile.delete();
+                state.setCopyFileState("fail");
+                System.out.println("文件已存在，将重命名文件删除");
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            state.setCopyFileState("fail");
+            System.out.println("文件复制失败！");
+
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        state.setCopyFilePath(newMovePath);
+        return newMovefile;
+
+    }
+
+
+
+}

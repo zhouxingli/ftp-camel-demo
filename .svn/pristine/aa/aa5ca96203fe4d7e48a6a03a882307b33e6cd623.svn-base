@@ -1,0 +1,12 @@
+package com.gdtopway.realtimedata.util;
+
+public class OperateFile {
+    public  void operateFile(){
+
+
+
+
+
+
+    }
+}

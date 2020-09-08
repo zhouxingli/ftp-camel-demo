@@ -1,0 +1,98 @@
+package com.gdtopway.realtimedata.util;
+
+import com.gdtopway.realtimedata.config.BaseConfig;
+import com.gdtopway.realtimedata.domain.RealTimeLoad;
+import com.gdtopway.realtimedata.domain.State;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+//解析信息文件 返回信息集合
+@Component
+public class ParseDataFromfile {
+    @Autowired
+    protected BaseConfig baseConfig;
+
+    public List<RealTimeLoad> parseRealTime(Map<String, String> copyFileMap) {
+        String newMovePath = copyFileMap.get("newMovePath");//年月日对应文件路径
+        String copyFile1 = copyFileMap.get("copyFile");//复制文件的状态
+        String indicatorCode = baseConfig.getLoadCode();
+        String renameDBTime = copyFileMap.get("renameDBTime");//规准时间
+        String strDate=copyFileMap.get("strDate");//实际时间
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date stateTime = null;
+        Date date=null;
+        try {
+            stateTime = formatter.parse(renameDBTime.toString());
+            date=formatter.parse(strDate.toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        File file = new File(newMovePath);
+        List<RealTimeLoad> list = new ArrayList<RealTimeLoad>();
+        //  Date date1=null;
+        if (file.isFile() && file.exists()) {
+            //考虑到编码格式
+            InputStreamReader read = null;
+            try {
+                read = new InputStreamReader(new FileInputStream(file), "UTF-8");
+            } catch (UnsupportedEncodingException e1) {
+                e1.printStackTrace();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+            BufferedReader bufferedReader = new BufferedReader(read);
+            String lineTxt = null;
+            //记录读取的数据文件的行数
+            int count = 0;
+            //定义字段的数组
+            String[] fields = null;//按空格分开数组
+            String[] fileds1 = null;//按点分割数组
+            String[] fileds2 = null;//按点分割数组
+            String[] fileds3 = null;//按冒号分割的数组
+            String[] f = null;
+            int num = 0;
+            String newStr = null;
+            try {
+                while ((lineTxt = bufferedReader.readLine()) != null) {
+                    fields = lineTxt.split(" ");//空格分出
+                   /* fileds3=fields[1].split(":");//取出时分秒 ，以冒号分割成数组
+                    fileds2=s2[0]+"-"+s2[1];//取出时、分*/
+                    if (count >= 2) {
+                        System.out.println(lineTxt);
+                        System.out.println(fields[0]);
+                        String fileld0 = fields[0];
+                        fileds1 = fileld0.split("\\.");
+                        if (fileds1[0].equals("SysStation") && RealTimeDataOrgTag.tag_org.containsKey(fileds1[1])) {
+                            RealTimeLoad realTimeLoad = new RealTimeLoad();
+                            realTimeLoad.setNodeName(fileds1[1]);
+                            realTimeLoad.setRecordValue(Double.parseDouble(fields[1]));
+                            realTimeLoad.setRecordTime(date);
+                            realTimeLoad.setGaugeTime(stateTime);
+                            realTimeLoad.setIndicatorCode(indicatorCode);
+                            realTimeLoad.setOrgCode(RealTimeDataOrgTag.tag_org.get(fileds1[1]));
+                            //将读取的每一行的记录存入到list集合中
+                            list.add(realTimeLoad);
+                        }
+                    }
+                    count++;
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            try {
+                read.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        } else {
+            System.out.println("找不到指定的文件");
+        }
+
+        return list;
+    }
+}

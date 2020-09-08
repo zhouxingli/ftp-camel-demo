@@ -1,0 +1,37 @@
+package com.gdtopway.realtimedata.config;
+
+import com.gdtopway.realtimedata.processor.DataProcessor;
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+/**
+ * camel-ftp 路由配置
+ *
+ * @author LuckyDL
+ * @date 2018.10.08
+ */
+@Component
+public class DownloadRoute extends RouteBuilder {
+    /**
+     * logger
+     */
+    private static final Logger logger = LoggerFactory.getLogger(DownloadRoute.class);
+
+    @Value("${sftp.url}")
+    private String url;
+    @Value("${sftp.local-dir}")
+    private String downloadLocation;
+    @Autowired
+    private DataProcessor dataProcessor;
+    @Override
+    public void configure() throws Exception {
+        from(url)
+                .to("file:" + downloadLocation)
+                .process(dataProcessor)
+                .log(LoggingLevel.INFO, logger, "Download file ${file:name} complete.");
+    }
+}

@@ -1,0 +1,10 @@
+base.defaultThemes=default
+base.staticRescorceDir=static
+base.generateDefaultThemes=default
+
+base.loadCode = 0306
+#年月日文件夹放置的位置
+base.newFilePath=D:/
+
+
+

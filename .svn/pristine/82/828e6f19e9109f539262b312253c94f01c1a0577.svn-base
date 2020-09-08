@@ -1,0 +1,15 @@
+package com.gdtopway.realtimedata.service.impl;
+
+import com.gdtopway.realtimedata.service.IRealTimeDataService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
+/**
+ * Created by rainbow on 2018/11/8.
+ */
+
+@Service
+public class RealTimeDataServiceImpl  implements IRealTimeDataService{
+
+}

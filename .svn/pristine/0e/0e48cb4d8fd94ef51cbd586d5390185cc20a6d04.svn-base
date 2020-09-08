@@ -1,0 +1,121 @@
+package com.gdtopway.realtimedata.util;
+
+import com.gdtopway.realtimedata.domain.State;
+import org.springframework.stereotype.Component;
+
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+@Component
+//重命名文件
+public class FileRename {
+
+    public File reNameFile(String oldfilePath, String oldfileName,State state) {
+        Map<String,String> map=new HashMap<String,String>();
+        String filePath=oldfilePath+File.separator +oldfileName;//文件路径
+        File oldFile=new File(filePath);//文件
+        InputStream input=null;
+        FileOutputStream output=null;
+        String[] s1=null;
+        String[] s2=null;
+        String s3=null;
+        String  reNameFilePath=null;//重命名文件路径
+        File reNameFile=null;//重命名文件
+        Date date1=null;//规准后时间
+        String flag = "false";//用于判断重命名文件是否入库（规准时间与数据库规准时间相比）
+        int i=0;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (oldFile.isFile() && oldFile.exists()){//判断文件是否已经存在
+            try {
+                InputStreamReader read = null;
+                try {
+                    read = new InputStreamReader(new FileInputStream(oldFile), "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                BufferedReader bufferedReader = new BufferedReader(read);
+                String lineTxt = null;
+                Date date=null;
+                int num=0;
+                String newStr=null;
+                while ((lineTxt = bufferedReader.readLine()) != null) {
+                    System.out.println(lineTxt);
+                    s1=lineTxt.split(" ");//读取第一行数据，以空格分割成数组
+                    s2=s1[1].split(":");//取出时分秒 ，以冒号分割成数组
+                    s3=s2[0]+"-"+s2[1];//取出时、分
+                    s2[2]="00";
+                    num=Integer.parseInt( s2[1]);
+                    Date actualTime=formatter.parse(lineTxt.toString());
+                    state.setActualTime(actualTime);//文件实际时间
+                    //  map.put("strDate",lineTxt);
+                    switch(num/15){
+                        case 0:
+                            s2[1]="00";
+                            newStr=s1[0]+" "+s2[0]+":"+s2[1]+":"+s2[2];
+                            date1= formatter.parse(newStr.toString());
+                            break;
+                        case 1:
+                            s2[1]="15";
+                            newStr=s1[0]+" "+s2[0]+":"+s2[1]+":"+s2[2];
+                            date1= formatter.parse(newStr.toString());
+                            break;
+
+                        case 2:
+                            s2[1]="30";
+                            newStr=s1[0]+" "+s2[0]+":"+s2[1]+":"+s2[2];
+                            date1= formatter.parse(newStr.toString());
+                            break;
+                        case 3:
+                            s2[1]="45";
+                            newStr=s1[0]+" "+s2[0]+":"+s2[1]+":"+s2[2];
+                            date1= formatter.parse(newStr.toString());
+                            break;
+                    }
+                    Date stateTime = formatter.parse(newStr.toString());
+                    state.setStateTime(stateTime);
+                    i++;
+                    if(i==1){
+                        break;
+                    }
+                }
+                read.close();//关闭流
+                reNameFilePath=oldFile.getParent()+ File.separator +s1[0]+" "+s3+".txt";
+                reNameFile = new File(reNameFilePath);//修改文件名
+                state.setOriginallyFilePath(reNameFilePath);//重命名文件
+                if(!reNameFile.exists()){//重命名文件不存在，改名
+                    oldFile.renameTo(reNameFile);//修改临时文件名称
+                    state.setOriginallyFileState("success");//重命名文件是否成功
+                    System.out.println("改名成功!");
+                } else if(reNameFile.exists()){
+                    reNameFile.delete();
+                    state.setOriginallyFileState("fail");
+                    System.out.println("改名失败");
+                }
+            } catch (UnsupportedEncodingException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (FileNotFoundException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }else{
+            System.out.println("文件不存在");
+        }
+        return reNameFile;
+    }
+
+
+
+
+}

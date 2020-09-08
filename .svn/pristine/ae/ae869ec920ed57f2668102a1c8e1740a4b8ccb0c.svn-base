@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+<#--<link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="css/base.css">-->
+    <style>
+        table,table tr th, table tr td { border:1px solid #0094ff; white-space: nowrap;  font-size: 12px;}
+        table { width: 200px; min-height: 25px; line-height: 25px; text-align: center; border-collapse: collapse;}
+    </style>
+</head>
+<body>
+<div id="app" style="width: 100%;">
+    <div class="statementTable" id="statement_table" style="overflow: auto;">
+        <table class="myTable table table-bordered" style="text-align: center;">
+            <thead >
+            <tr>
+                <th>编号</th>
+                <th>原始文件路径</th>
+                <th>原始文件是否存在</th>
+                <th>年月日文件路径</th>
+                <th>年月日文件是否存在</th>
+                <th>是否入库</th>
+                <th>规准时间</th>
+            </tr>
+
+            </thead>
+            <tbody id="into">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="/JS/jquery-1.12.4.js" type="text/javascript"></script>
+<script>
+    console.log("sdfsdf");
+    $(function(){
+        getLoc();
+    });
+    function getLoc(){
+        $.ajax({
+            type:"get",
+            url:"${contextPath}/info/realTimeLoadinfo",
+            dataType:"json",
+            contentType:"json/application",
+            success:function(data){
+                var tb=$("#into");
+                tb.empty();
+                $.each(data,function(i,item){
+                    tb.append(" <tr >" +
+                            "<td >"+item.id+"</td>" +
+                            "<td >"+item.originallyFilePath+"</td>" +
+                            "<td >"+item.originallyFileState+"</td>" +
+                            "<td >"+item.copyFilePath+"</td>" +
+                            "<td >"+item.copyFileState+"</td>" +
+                            "<td >"+item.putInStorageState+"</td>" +
+                            "<td >"+item.stateTime+"</td>" +
+                            "</tr>")
+                })
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+package com.gdtopway.realtimedata.util;
+
+import com.gdtopway.realtimedata.domain.RealTimeLoad;
+import com.gdtopway.realtimedata.domain.State;
+import com.gdtopway.realtimedata.repository.RealTimeLoadRepository;
+import com.gdtopway.realtimedata.service.IRealTimeDataService;
+import com.gdtopway.realtimedata.service.StateService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+@Component
+public class DoFile {
+    @Autowired
+    private RealTimeLoadRepository realTimeLoadRepository;
+    @Autowired
+    private StateService stateService;
+    @Autowired
+    private IRealTimeDataService iRealTimeDataService;
+    @Autowired
+    private RenameFile renameFile;
+    @Autowired
+    private CopyFile copyFile;
+    @Autowired
+    private ParseDataFromfile parseDataFromfile;
+    @Autowired
+    private StateFile stateFile;
+    public void doFile(Map<String ,String> renameMap ){
+
+        if (renameMap.get("flag").equals("true")) {//取出重命名文件中的返回信息（重命名文件规准时间与数据库规准时间相比）
+            //2.将文件复制到相应年月日下
+            Map<String, String> copyFileMap = copyFile.copyFileTo(renameMap);
+            //3.解析文件
+            List<RealTimeLoad> list = parseDataFromfile.parseRealTime(copyFileMap);
+            //4.保存文件
+            List<RealTimeLoad> realList = iRealTimeDataService.saveList(list);
+            if (realList.size()>0) {
+                copyFileMap.put("putInStorageState","success") ;
+            } else {
+                copyFileMap.put("putInStorageState","fail") ;
+            }
+            State state = stateFile.saveStateInfo(copyFileMap);
+            stateService.saveState(state);
+        }else{
+            State state = stateFile.saveStateInfo(renameMap);
+            stateService.saveState(state);
+        }
+
+
+
+
+    }
+
+
+
+}

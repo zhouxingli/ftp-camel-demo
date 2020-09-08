@@ -1,0 +1,48 @@
+package com.gdtopway.realtimedata.processor;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.component.file.GenericFileMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.*;
+
+/**
+ * Created by rainbow on 2018/11/6.
+ * 调度数据处理器
+ */
+@Component
+public class DataProcessor implements Processor {
+
+    @Value("${ftp.local-dir}")
+    private String localDir;
+
+    private static final Logger logger = LoggerFactory.getLogger(DataProcessor.class);
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+
+        GenericFileMessage<RandomAccessFile> inFileMessage = (GenericFileMessage<RandomAccessFile>) exchange.getIn();
+        String fileName = inFileMessage.getGenericFile().getFileName();
+
+        String filePath = localDir + '/' + fileName;
+        logger.info("fileName------------:"+filePath);
+        //1、第一件事情,读取临时文件的第一行,读取快照时间,关闭流,改名称(精确到分);
+        //2、判断年月日,文件夹下,是否存在该快照(精确到分钟)文件。如果不存在,则移动快照至相应的文件夹,年、月、日,在日文件夹下,以时间命名。
+        //3、解析临时文件,得到一堆负荷对象,入库。
+        
+        //4、移除掉改名后的临时文件
+
+
+    }
+
+    private void reNameFile(String filePath) throws Exception {
+        File ddFile = new File(filePath);
+        //InputStream inputStream = new BufferedInputStream(new FileInputStream(filePath));
+
+
+    }
+}

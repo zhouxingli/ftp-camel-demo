@@ -1,0 +1,75 @@
+ftp:
+ftp.username = naridicp
+ftp.passwd = nari123
+ftp.path = 10.126.11.74
+#ftp.username = qxu1146370255
+#ftp.passwd = Zmqftp2018
+#ftp.path = 121.42.88.102:21/wwwlogs
+#其它参数:readLock=rename表明,FTP不读取正在写的文件。delay表明每隔多少时间FTP下载一次文件。filter表明过滤器,用以过滤掉不想下载的文件,delete表明是否在下载完后删除FTP服务器上的数据,recursive表明是否递归读取子文件夹
+ftp.options = readLock=rename&delay=900s&binary=true&passiveMode=true&filter=#txtFileFilter&delete=false&recursive=false
+ftp.url = ftp://${ftp.username}@${ftp.path}/?password=${ftp.passwd}&${ftp.options}
+# 本地下载目录
+ftp.local-dir = E:/rainbow
+# 后台运行进程
+camel.springboot.main-run-controller = true
+
+management.endpoint.camelroutes.enabled: true
+management.endpoint.camelroutes.read-only: true
+
+server.port=9999
+server.context-path=/ftp_demo
+
+
+
+
+
+
+
+
+#spring.datasource.url = jdbc:oracle:thin:@localhost:1521:orcl
+spring.datasource.url = jdbc:oracle:thin:@10.150.193.179:1530:FSYJDB
+#spring.datasource.url = jdbc:oracle:thin:@192.168.100.109:1521:orcl
+
+spring.datasource.username = bigdata_zcgl
+spring.datasource.password = orcl
+spring.datasource.driverClassName = oracle.jdbc.driver.OracleDriver
+# Specify the DBMS
+spring.jpa.database = Oracle
+# Show or not log for each sql query
+spring.jpa.show-sql = true
+# Hibernate ddl auto (create, create-drop, update)
+spring.jpa.hibernate.ddl-auto = update
+# stripped before adding them to the entity manager)
+#spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
+
+
+
+# FREEMARKER (FreeMarkerAutoConfiguration)
+spring.freemarker.allow-request-override=false
+spring.freemarker.allow-session-override=false
+#目前先不缓存,用于热启动
+spring.freemarker.cache=false
+spring.freemarker.charset=UTF-8
+spring.freemarker.check-template-location=true
+spring.freemarker.content-type=text/html
+spring.freemarker.enabled=true
+spring.freemarker.expose-request-attributes=false
+spring.freemarker.expose-session-attributes=false
+spring.freemarker.expose-spring-macro-helpers=true
+spring.freemarker.prefer-file-system-access=true
+spring.freemarker.suffix=.ftl
+spring.freemarker.template-loader-path=classpath:/templates/
+spring.freemarker.settings.template_update_delay=0
+spring.freemarker.settings.default_encoding=UTF-8
+spring.freemarker.settings.classic_compatible=true
+spring.freemarker.order=1
+
+#自定义messageBEAN的路径及名称
+spring.messages.basename=validator-messages
+
+#添加那个目录的文件需要restart
+spring.devtools.restart.additional-paths=src/main/java
+#排除那个目录的文件不需要restart
+spring.devtools.restart.exclude=static/**,public/**,src/main/resources/static/**,src/main/resources/templates/**
+
+
